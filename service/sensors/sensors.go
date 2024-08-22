@@ -2,8 +2,8 @@ package sensors
 
 import (
 	"fmt"
-	"log"
 	"strconv"
+	"time"
 
 	"github.com/emmrys-jay/anomaly-detection-api/internal/model"
 )
@@ -21,7 +21,6 @@ func LogSensorsData(records [][]string) error {
 			assignStructValue(idxIn, &datum, column)
 		}
 
-		log.Printf("Values received are: %+v\n", datum)
 		data = append(data, datum)
 	}
 
@@ -91,11 +90,28 @@ func assignStructValue(idx int, target *model.SensorsData, value string) {
 		target.Longitude = res
 
 	case 8:
+		res, err := time.Parse("2006-01-02 15:04:05", value)
+		if err != nil {
+			return
+		}
+		target.DateTime = res
+
+	case 9:
 		res, err := strconv.ParseInt(value, 10, 8)
 		if err != nil {
 			return
 		}
 		target.VibrationDetected = int8(res)
+
+	case 10:
+		res, err := strconv.ParseFloat(value, 64)
+		if err != nil {
+			return
+		}
+		target.Temperature = res
+
+	default: 
+		return
 	}
 }
 

@@ -1,15 +1,32 @@
 package model
 
+import (
+	"strings"
+	"time"
+)
+
 var csvHeaders = []string{
-	"AccX",
-	"AccY",
-	"AccZ",
-	"GyrX",
-	"GyrY",
-	"GyrZ",
+	"AcX",
+	"AcY",
+	"AcZ",
+	"GyX",
+	"GyY",
+	"GyZ",
 	"Latitude",
 	"Longitude",
+	"Time",
 	"Vibration Detected",
+	"Temp",
+}
+
+func IsHeader(row []string) bool {
+	for idx, val := range row {
+		if !strings.EqualFold(val, csvHeaders[idx]) {
+			return false
+		}
+	}
+
+	return true
 }
 
 type SensorsData struct {
@@ -21,5 +38,7 @@ type SensorsData struct {
 	GyrZ              float64
 	Latitude          float64
 	Longitude         float64
+	DateTime time.Time
 	VibrationDetected int8
+	Temperature float64
 }
