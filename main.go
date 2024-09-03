@@ -5,12 +5,13 @@ import (
 	"net/http"
 
 	"github.com/emmrys-jay/anomaly-detection-api/internal/config"
+	mongodb "github.com/emmrys-jay/anomaly-detection-api/pkg/repository/mongo"
 	"github.com/emmrys-jay/anomaly-detection-api/pkg/router"
 )
 
 func init() {
 	// setup mongoDB
-	// mongodb.ConnectDB()
+	mongodb.ConnectDB()
 }
 
 func main() {

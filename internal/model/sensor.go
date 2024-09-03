@@ -15,9 +15,14 @@ var csvHeaders = []string{
 	"Latitude",
 	"Longitude",
 	"Time",
+	"Speed",
 	"Vibration Detected",
 	"Temp",
 }
+
+var DatabaseName = "anomaly_detection"
+var CollectionName = "sensor_data"
+
 
 func IsHeader(row []string) bool {
 	for idx, val := range row {
@@ -39,6 +44,7 @@ type SensorsData struct {
 	Latitude          float64
 	Longitude         float64
 	DateTime time.Time
+	Speed float64
 	VibrationDetected int8
 	Temperature float64
 }

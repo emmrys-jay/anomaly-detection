@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/emmrys-jay/anomaly-detection-api/internal/model"
+	mongodb "github.com/emmrys-jay/anomaly-detection-api/pkg/repository/mongo"
 )
 
 func LogSensorsData(records [][]string) error {
@@ -17,6 +18,10 @@ func LogSensorsData(records [][]string) error {
 
 		var datum model.SensorsData
 
+		if model.IsHeader(row) {
+			continue
+		}
+
 		for idxIn, column := range row {
 			assignStructValue(idxIn, &datum, column)
 		}
@@ -24,8 +29,10 @@ func LogSensorsData(records [][]string) error {
 		data = append(data, datum)
 	}
 
-	printStruct(data)
-	// Save to database
+	err := mongodb.CreateSensorDataEntry(data)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -97,13 +104,20 @@ func assignStructValue(idx int, target *model.SensorsData, value string) {
 		target.DateTime = res
 
 	case 9:
+		res, err := strconv.ParseFloat(value, 64)
+		if err != nil {
+			return
+		}
+		target.Speed = res
+		
+	case 10:
 		res, err := strconv.ParseInt(value, 10, 8)
 		if err != nil {
 			return
 		}
 		target.VibrationDetected = int8(res)
 
-	case 10:
+	case 11:
 		res, err := strconv.ParseFloat(value, 64)
 		if err != nil {
 			return
@@ -117,7 +131,8 @@ func assignStructValue(idx int, target *model.SensorsData, value string) {
 
 func printStruct(value []model.SensorsData) {
 	for _, val := range value {
-		fmt.Printf("%v,%v,%v,%v,%v,%v,%v,%v,%v\n", val.AccX, val.AccY, val.AccZ,
-			val.GyrX, val.GyrY, val.GyrZ, val.Longitude, val.Latitude, val.VibrationDetected)
+		fmt.Printf("%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v,%v\n", val.AccX, val.AccY, val.AccZ,
+			val.GyrX, val.GyrY, val.GyrZ, val.Longitude, val.Latitude, val.DateTime, 
+			val.Speed, val.VibrationDetected, val.Temperature)
 	}
 }

@@ -7,11 +7,11 @@ import (
 	"time"
 )
 
-func logRequestData(code, timeElapsed time.Duration, timeForReceivedRequest time.Time, req *http.Request) {
+func logRequestData(code int, timeElapsed time.Duration, timeForReceivedRequest time.Time, req *http.Request) {
 	fmt.Printf("%v\t%v\t%v\t%v\t%v\t%v\n", 
 	timeForReceivedRequest.Format(time.RFC3339),
 	code, 
-	timeElapsed.Seconds() * -1,
+	fmt.Sprint(timeElapsed.Seconds() * -1) + "s",
 	req.RemoteAddr,
 	req.Method,
 	req.URL.Path,
