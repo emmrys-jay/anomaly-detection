@@ -35,16 +35,17 @@ func IsHeader(row []string) bool {
 }
 
 type SensorsData struct {
-	AccX              float64
-	AccY              float64
-	AccZ              float64
-	GyrX              float64
-	GyrY              float64
-	GyrZ              float64
-	Latitude          float64
-	Longitude         float64
-	DateTime time.Time
-	Speed float64
-	VibrationDetected int8
-	Temperature float64
+	AccX              float64   `bson:"Accel_X"`
+	AccY              float64   `bson:"Accel_Y"`
+	AccZ              float64   `bson:"Accel_Z"`
+	GyrX              float64   `bson:"Gyro_X"`
+	GyrY              float64   `bson:"Gyro_Y"`
+	GyrZ              float64   `bson:"Gyro_Z"`
+	Latitude          float64   `bson:"Latitude"`
+	Longitude         float64   `bson:"Longitude"`
+	DateTime          time.Time `bson:"Time"`
+	Speed             float64   `bson:"Speed"`
+	VibrationDetected int8      `bson:"Vibration"`
+	Temperature       float64   `bson:"Temperature"`
+	CreatedAt time.Time 		`bson:"CreatedAt"`
 }
