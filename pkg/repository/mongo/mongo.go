@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"crypto/tls"
 	"log"
 	"os"
 	"strings"
@@ -20,22 +21,22 @@ func GetDB() *mongo.Client {
 }
 
 func ConnectDB() *mongo.Client {
-	// tlsConfig := &tls.Config{}
-	// tlsConfig.InsecureSkipVerify = true
+	tlsConfig := &tls.Config{}
+	tlsConfig.InsecureSkipVerify = true
 	uri := strings.TrimSpace(os.Getenv("MONGODB_URL"))
 
 	if uri == "" {
 		log.Fatalln("No database URL was specified")
 	}
 
-	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	opts := options.Client().ApplyURI(uri).SetServerAPIOptions(serverAPI)
+	// serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	// opts := options.Client().ApplyURI(uri).SetServerAPIOptions(serverAPI)
 
-	// connectOptions := options.Client().ApplyURI(uri).SetTLSConfig(tlsConfig)
+	connectOptions := options.Client().ApplyURI(uri).SetTLSConfig(tlsConfig)
 
 	ctx, cancel := context.WithTimeout(context.Background(), DB_CONTEXT_TIMEOUT)
 	defer cancel()
-	client, err := mongo.Connect(ctx, opts)
+	client, err := mongo.Connect(ctx, connectOptions)
 
 	if err != nil {
 		log.Fatalln("could not connect to database url, err - ", err)
