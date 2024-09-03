@@ -51,9 +51,11 @@ func ConnectDB() *mongo.Client {
 
 func CreateSensorDataEntry(entry []model.SensorsData) error {
 	coll := mongoClient.Database(model.DatabaseName).Collection(model.CollectionName)
-
+	
+	now := time.Now()
 	var data []any
 	for _, v := range entry {
+		v.CreatedAt = now
 		data = append(data, v)
 	}
 

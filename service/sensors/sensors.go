@@ -29,10 +29,8 @@ func LogSensorsData(records [][]string) error {
 		data = append(data, datum)
 	}
 
-	err := mongodb.CreateSensorDataEntry(data)
-	if err != nil {
-		return err
-	}
+	// run in background
+	go mongodb.CreateSensorDataEntry(data)
 
 	return nil
 }
@@ -109,7 +107,7 @@ func assignStructValue(idx int, target *model.SensorsData, value string) {
 			return
 		}
 		target.Speed = res
-		
+
 	case 10:
 		res, err := strconv.ParseInt(value, 10, 8)
 		if err != nil {

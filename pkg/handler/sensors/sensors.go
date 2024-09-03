@@ -43,6 +43,6 @@ func LogSensorData(res http.ResponseWriter, req *http.Request) {
 
 	res.WriteHeader(http.StatusCreated)
 	res.Header().Add("Content-Type", "text/csv")
-	res.Write([]byte("Success,Added Records"))
+	res.Write([]byte("Success,Submitted Records"))
 	logRequestData(http.StatusCreated, time.Until(now), now, req)
 }
