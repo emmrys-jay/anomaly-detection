@@ -1,7 +1,10 @@
 package sensors
 
 import (
+	"encoding/csv"
 	"fmt"
+	"log"
+	"os"
 	"strconv"
 	"time"
 
@@ -33,6 +36,67 @@ func LogSensorsData(records [][]string) error {
 	go mongodb.CreateSensorDataEntry(data)
 
 	return nil
+}
+
+func LabelData() error {
+	file, err := os.OpenFile("data.csv", os.O_APPEND|os.O_RDONLY|os.O_WRONLY, 0777)
+	if err != nil {
+		log.Println("Could not open file, error - ", err.Error())
+		return err
+	}
+
+	records, err := csv.NewReader(file).ReadAll()
+	filters := make([]model.LabelFilter, 0, len(records))
+
+	for _, row := range records {
+		var labelFilter model.LabelFilter
+
+		for idx, col := range row {
+			if idx == 0 {
+				t, err := time.Parse("2006-01-02 15:04:05", col)
+				if err != nil {
+					log.Fatalln("Could not parse time, error - ", err.Error())
+					return err
+				}
+
+				labelFilter.StartTime = t
+			}
+
+			if idx == 1 {
+				labelFilter.Anomaly = col
+			}
+
+			if idx == 2 {
+				t, err := time.Parse("2006-01-02 15:04:05", col)
+				if err != nil {
+					log.Fatalln("Could not parse time, error - ", err.Error())
+					return err
+				}
+
+				labelFilter.EndTime = t
+			}
+		}
+
+		filters = append(filters, labelFilter)
+	}
+
+	err = mongodb.LabelData(filters)
+	if err != nil {
+		log.Fatalln("Could not label data, error - ", err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func DeleteInvalidData() error {
+	err := mongodb.DeleteInvalidData()
+	return err
+}
+
+func MoveData() error {
+	err := mongodb.MoveData()
+	return err
 }
 
 func assignStructValue(idx int, target *model.SensorsData, value string) {

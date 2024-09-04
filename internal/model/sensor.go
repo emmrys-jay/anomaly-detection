@@ -49,3 +49,9 @@ type SensorsData struct {
 	Temperature       float64   `bson:"Temperature"`
 	CreatedAt time.Time 		`bson:"CreatedAt"`
 }
+
+type LabelFilter struct {
+	StartTime time.Time
+	Anomaly string
+	EndTime time.Time
+}

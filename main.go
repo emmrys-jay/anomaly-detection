@@ -12,6 +12,7 @@ import (
 func init() {
 	// setup mongoDB
 	mongodb.ConnectDB()
+	mongodb.ConnectNewDB()
 }
 
 func main() {

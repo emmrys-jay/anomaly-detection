@@ -46,3 +46,57 @@ func LogSensorData(res http.ResponseWriter, req *http.Request) {
 	res.Write([]byte("Success,Submitted Records"))
 	logRequestData(http.StatusCreated, time.Until(now), now, req)
 }
+
+func LabelData(res http.ResponseWriter, req *http.Request) {
+	now := time.Now()
+
+	err := sensors.LabelData()
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Header().Add("Content-Type", "text/csv")
+		res.Write([]byte("Internal Server Error," + err.Error()))
+		logRequestData(http.StatusInternalServerError, time.Until(now), now, req)
+		return
+	}
+
+	res.WriteHeader(http.StatusCreated)
+	res.Header().Add("Content-Type", "text/csv")
+	res.Write([]byte("Data has been labelled"))
+	logRequestData(http.StatusCreated, time.Until(now), now, req)
+}
+
+func DeleteInvalidData(res http.ResponseWriter, req *http.Request) {
+	now := time.Now()
+
+	err := sensors.DeleteInvalidData()
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Header().Add("Content-Type", "text/csv")
+		res.Write([]byte("Internal Server Error," + err.Error()))
+		logRequestData(http.StatusInternalServerError, time.Until(now), now, req)
+		return
+	}
+
+	res.WriteHeader(http.StatusCreated)
+	res.Header().Add("Content-Type", "text/csv")
+	res.Write([]byte("Data has been deleted"))
+	logRequestData(http.StatusCreated, time.Until(now), now, req)
+}
+
+func MoveData(res http.ResponseWriter, req *http.Request) {
+	now := time.Now()
+
+	err := sensors.MoveData()
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Header().Add("Content-Type", "text/csv")
+		res.Write([]byte("Internal Server Error," + err.Error()))
+		logRequestData(http.StatusInternalServerError, time.Until(now), now, req)
+		return
+	}
+
+	res.WriteHeader(http.StatusCreated)
+	res.Header().Add("Content-Type", "text/csv")
+	res.Write([]byte("Data has been moved"))
+	logRequestData(http.StatusCreated, time.Until(now), now, req)
+}
