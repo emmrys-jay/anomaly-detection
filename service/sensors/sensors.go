@@ -3,9 +3,10 @@ package sensors
 import (
 	"encoding/csv"
 	"fmt"
+	"io/ioutil"
 	"log"
-	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/emmrys-jay/anomaly-detection-api/internal/model"
@@ -39,13 +40,26 @@ func LogSensorsData(records [][]string) error {
 }
 
 func LabelData() error {
-	file, err := os.OpenFile("data.csv", os.O_APPEND|os.O_RDONLY|os.O_WRONLY, 0777)
+	// file, err := os.OpenFile("data.csv", os.O_APPEND|os.O_RDONLY|os.O_WRONLY, 0777)
+	// if err != nil {
+	// 	log.Println("Could not open file, error - ", err.Error())
+	// 	return err
+	// }
+
+	contents, err := ioutil.ReadFile("data.csv")
 	if err != nil {
-		log.Println("Could not open file, error - ", err.Error())
+		log.Println("Error getting contents, error - ", err.Error())
 		return err
 	}
 
-	records, err := csv.NewReader(file).ReadAll()
+	reader := strings.NewReader(string(contents))
+	
+	records, err := csv.NewReader(reader).ReadAll()
+	if err != nil {
+		log.Println("Error getting contents, error - ", err.Error())
+		return err
+	}
+
 	filters := make([]model.LabelFilter, 0, len(records))
 
 	for _, row := range records {
@@ -59,7 +73,7 @@ func LabelData() error {
 					return err
 				}
 
-				labelFilter.StartTime = t
+				labelFilter.StartTime = t.Add(-1 * time.Hour)
 			}
 
 			if idx == 1 {
@@ -73,7 +87,7 @@ func LabelData() error {
 					return err
 				}
 
-				labelFilter.EndTime = t
+				labelFilter.EndTime = t.Add(-1 * time.Hour)
 			}
 		}
 
@@ -96,6 +110,11 @@ func DeleteInvalidData() error {
 
 func MoveData() error {
 	err := mongodb.MoveData()
+	return err
+}
+
+func LabelNoneData() error {
+	err := mongodb.LabelNoneData()
 	return err
 }
 

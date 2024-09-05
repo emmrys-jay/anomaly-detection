@@ -105,7 +105,7 @@ func MoveData() error {
 
 
 func CreateSensorDataEntry(entry []model.SensorsData) error {
-	coll := mongoClient.Database(model.DatabaseName).Collection(model.CollectionName)
+	coll := newMongoClient.Database(model.DatabaseName).Collection(model.CollectionName)
 	
 	now := time.Now()
 	var data []any
@@ -124,7 +124,7 @@ func CreateSensorDataEntry(entry []model.SensorsData) error {
 }
 
 func LabelData(filters []model.LabelFilter) error {
-	coll := mongoClient.Database(model.DatabaseName).Collection(model.CollectionName)
+	coll := newMongoClient.Database(model.DatabaseName).Collection(model.CollectionName)
 
 	writeModels := make([]mongo.WriteModel, 0, len(filters))
 	for _, label := range filters {
@@ -150,7 +150,7 @@ func LabelData(filters []model.LabelFilter) error {
 }
 
 func DeleteInvalidData() error {
-	coll := mongoClient.Database(model.DatabaseName).Collection(model.CollectionName)
+	coll := newMongoClient.Database(model.DatabaseName).Collection(model.CollectionName)
 
 	filter := bson.D{{
 		Key: "Latitude",
@@ -158,6 +158,25 @@ func DeleteInvalidData() error {
 	}}
 
 	_, err := coll.DeleteMany(context.Background(), filter)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func LabelNoneData() error {
+	coll := newMongoClient.Database(model.DatabaseName).Collection(model.CollectionName)
+
+	model := mongo.NewUpdateManyModel().
+		SetFilter(bson.D{{Key: "Anomaly", Value: bson.D{{Key: "$exists", Value: false}}}}).
+		SetUpdate(bson.D{{Key: "$set", Value: bson.D{{Key: "Anomaly", Value: "None"}}}})
+
+	
+	writeModels := []mongo.WriteModel{model}
+	
+	bulkOption := options.BulkWrite().SetOrdered(false)
+	_, err := coll.BulkWrite(context.Background(), writeModels, bulkOption)
 	if err != nil {
 		return err
 	}

@@ -100,3 +100,21 @@ func MoveData(res http.ResponseWriter, req *http.Request) {
 	res.Write([]byte("Data has been moved"))
 	logRequestData(http.StatusCreated, time.Until(now), now, req)
 }
+
+func LabelNoneData(res http.ResponseWriter, req *http.Request) {
+	now := time.Now()
+
+	err := sensors.LabelNoneData()
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Header().Add("Content-Type", "text/csv")
+		res.Write([]byte("Internal Server Error," + err.Error()))
+		logRequestData(http.StatusInternalServerError, time.Until(now), now, req)
+		return
+	}
+
+	res.WriteHeader(http.StatusCreated)
+	res.Header().Add("Content-Type", "text/csv")
+	res.Write([]byte("Data has been labelled"))
+	logRequestData(http.StatusCreated, time.Until(now), now, req)
+}
